@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Uploader</title>
+</head>
+<body>
+    <h2>Upload PDF</h2>
+    <form id="uploadForm">
+        <label>Title:</label>
+        <input type="text" id="title" required /><br/><br/>
+        <label>Select PDF:</label>
+        <input type="file" id="file" accept="application/pdf" required /><br/><br/>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Uploaded PDFs</h2>
+    <ul id="pdfList"></ul>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const title = document.getElementById('title').value;
+            const file = document.getElementById('file').files[0];
+
+            formData.append('title', title);
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://localhost:5000/upload-files', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to upload');
+                }
+
+                alert('PDF uploaded successfully');
+                loadPdfs();
+            } catch (error) {
+                console.error('Error uploading PDF:', error);
+            }
+        });
+
+        async function loadPdfs() {
+            const pdfList = document.getElementById('pdfList');
+            pdfList.innerHTML = '';
+
+            try {
+                const response = await fetch('http://localhost:5000/get-files');
+                const result = await response.json();
+                result.data.forEach((pdf) => {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = `/files/${pdf.pdf}`;
+                    link.textContent = pdf.title;
+                    link.target = '_blank';
+                    listItem.appendChild(link);
+                    pdfList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error loading PDFs:', error);
+            }
+        }
+
+        // Load PDFs on page load
+        loadPdfs();
+    </script>
+</body>
+</html>
