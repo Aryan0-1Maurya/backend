@@ -30,7 +30,7 @@
             formData.append('file', file);
 
             try {
-                const response = await fetch('http://localhost:5000/upload-files', {
+                const response = await fetch('https://backend-nine-delta-99.vercel.app/upload-files', {
                     method: 'POST',
                     body: formData,
                 });
@@ -51,7 +51,7 @@
             pdfList.innerHTML = '';
 
             try {
-                const response = await fetch('http://localhost:5000/get-files');
+                const response = await fetch('https://backend-nine-delta-99.vercel.app/get-files');
                 const result = await response.json();
                 result.data.forEach((pdf) => {
                     const listItem = document.createElement('li');
